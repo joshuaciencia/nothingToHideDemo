@@ -11,12 +11,10 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public abstract class DirectGame implements ApplicationListener {
 
 	protected SpriteBatch batch;
-	protected OrthographicCamera camera;
 
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		camera = new OrthographicCamera();
 	}
 
 	@Override
