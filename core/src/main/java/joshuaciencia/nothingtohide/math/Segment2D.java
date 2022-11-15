@@ -9,8 +9,6 @@ public class Segment2D
     private Vector2 b;
 
     public Segment2D(Vector2 a, Vector2 b){
-        b.y = Game.VIEWPORT_HEIGHT - b.y;
-        a.y = Game.VIEWPORT_HEIGHT - a.y;
         this.a = a;
         this.b = b;
     }
