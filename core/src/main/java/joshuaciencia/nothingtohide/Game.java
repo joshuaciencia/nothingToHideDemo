@@ -6,14 +6,11 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Collections;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import joshuaciencia.nothingtohide.math.Intersect;
 import joshuaciencia.nothingtohide.math.Segment2D;
-
-import java.util.Comparator;
 
 
 public class Game extends DirectGame{
@@ -27,8 +24,7 @@ public class Game extends DirectGame{
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private Texture background, foreground;
-
-    private Segment2D[] segments;
+    
     private Segment2D[] rays;
 
     @Override
@@ -42,51 +38,6 @@ public class Game extends DirectGame{
         foreground = new Texture(Gdx.files.internal("foreground.png"));
         background = new Texture(Gdx.files.internal("background.png"));
         batch = new SpriteBatch();
-        segments = new Segment2D[] {
-
-            // Border
-            new Segment2D(new Vector2(0,0), new Vector2(VIEWPORT_WIDTH,0)),
-            new Segment2D(new Vector2(VIEWPORT_WIDTH,0), new Vector2(VIEWPORT_WIDTH,VIEWPORT_HEIGHT)),
-            new Segment2D(new Vector2(VIEWPORT_WIDTH, VIEWPORT_HEIGHT), new Vector2(0,VIEWPORT_HEIGHT)),
-            new Segment2D(new Vector2(0, VIEWPORT_HEIGHT), new Vector2(0,0)),
-
-            // polygon #1
-            new Segment2D(new Vector2(100, 150), new Vector2(120, 50)),
-            new Segment2D(new Vector2(120, 50), new Vector2(200, 80)),
-            new Segment2D(new Vector2(200, 80), new Vector2(140, 210)),
-            new Segment2D(new Vector2(140, 210), new Vector2(100, 150)),
-
-            // polygon #2
-                new Segment2D(new Vector2(100, 200), new Vector2(120, 250)),
-                new Segment2D(new Vector2(120, 250), new Vector2(60, 300)),
-                new Segment2D(new Vector2(60, 300), new Vector2(100, 200)),
-
-                // polygon #3
-
-                new Segment2D(new Vector2(200, 260), new Vector2(220, 150)),
-                new Segment2D(new Vector2(220, 150), new Vector2(300, 200)),
-                new Segment2D(new Vector2(300, 200), new Vector2(350, 320)),
-                new Segment2D(new Vector2(350, 320), new Vector2(200, 260)),
-
-                // polygon #4
-
-                new Segment2D(new Vector2(540, 60), new Vector2(560, 40)),
-                new Segment2D(new Vector2(560, 40), new Vector2(570, 70)),
-                new Segment2D(new Vector2(570, 70), new Vector2(540, 60)),
-
-                // polygon #5
-
-                new Segment2D(new Vector2(650, 190), new Vector2(760, 170)),
-                new Segment2D(new Vector2(760, 170), new Vector2(740, 270)),
-                new Segment2D(new Vector2(740, 270), new Vector2(630, 290)),
-                new Segment2D(new Vector2(630, 290), new Vector2(650, 190)),
-
-                // polygon #6
-
-                new Segment2D(new Vector2(600, 95), new Vector2(780, 50)),
-                new Segment2D(new Vector2(780, 50), new Vector2(680, 150)),
-                new Segment2D(new Vector2(680, 150), new Vector2(600, 95)),
-        };
 
     }
 
@@ -123,7 +74,7 @@ public class Game extends DirectGame{
 
         shapeRenderer.begin();
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(1, 0,0,1);
+        shapeRenderer.setColor(0.5f, 0.5f,0.5f,1);
         for(int r = 0; r < rays.length; r+=1) {
 
             Segment2D ray1 = rays[r];
@@ -142,10 +93,6 @@ public class Game extends DirectGame{
         for(Segment2D segment2D: segments){
             shapeRenderer.line(segment2D.getA(), segment2D.getB());
         }
-//        shapeRenderer.setColor(0, 0,1,1);
-//        for(Segment2D ray: rays){
-//            shapeRenderer.line(ray.getA(), ray.getB());
-//        }
 
 
         shapeRenderer.end();
@@ -170,7 +117,17 @@ public class Game extends DirectGame{
         int counter = 0;
 
         for(int s = 0; s < segments.length; s++) {
-            Vector2 a = new Vector2(Gdx.input.getX(), VIEWPORT_HEIGHT - Gdx.input.getY());
+
+            float mosY = Gdx.input.getY();
+            float mosX = Gdx.input.getX();
+
+            mosY = Math.min(mosY, VIEWPORT_HEIGHT - 1);
+            mosX = Math.min(mosX, VIEWPORT_WIDTH - 1);
+            mosY = Math.max(mosY, 1);
+            mosX = Math.max(mosX, 1);
+
+            Vector2 a = new Vector2(mosX, VIEWPORT_HEIGHT - mosY);
+
             Vector2 b = new Vector2(segments[s].getB());
             Vector2 c = new Vector2(b).sub(a).nor().scl(VIEWPORT_WIDTH);
             Vector2 d = new Vector2(b).sub(a).nor().scl(VIEWPORT_WIDTH);
@@ -206,7 +163,6 @@ public class Game extends DirectGame{
     private void sortRays() {
 
         Array<Segment2D> list = new Array<>();
-        float[] angles = new float[rays.length];
 
         for(int r = 0; r < rays.length; r++) {
             list.add(rays[r]);
@@ -224,8 +180,6 @@ public class Game extends DirectGame{
 
         for(int i = 0; i < list.size; i++) {
             rays[i] = list.get(i);
-            Segment2D ray = rays[i];
-            angles[i] = new Vector2(ray.getB()).sub(ray.getA()).nor().angleDeg();
         }
     }
 
